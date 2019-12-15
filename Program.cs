@@ -35,9 +35,41 @@ namespace jurassic_park
         {
             Console.WriteLine("Jurrasic Park has");
             Console.WriteLine("-------------------");
-            foreach (var dinosaur in dinosaurs)
+            var date=dinosaurs.OrderBy(x=>x.DateAcquired);
+            
+            foreach (var dinosaur in date)
             {
-                Console.WriteLine($"Name: {dinosaur.Name}, Diet: {dinosaur.DietType}, Weight: {dinosaur.Weight}, Enclosure: {dinosaur.EnclosureNumber}, Date Aqcuired: {dinosaur.DateAcquired}");
+                Console.WriteLine($"Name: {dinosaur.Name}, Diet: {dinosaur.DietType}, Weight: {dinosaur.Weight}, Enclosure: {dinosaur.EnclosureNumber}, Date Acquired: {dinosaur.DateAcquired}");
+            }
+        }
+        static void DietSummary(IEnumerable<Dinosaurid> dinosaurs)
+        {
+            Console.WriteLine("Jurrassic Park has");
+            Console.WriteLine("--------------------");
+            int carnivore=0;
+            int herbivore=0;
+            foreach(var dinosaur in dinosaurs)
+            {
+                if(dinosaur.DietType=="carnivore")
+                {
+                    carnivore++;
+                }
+                else if (dinosaur.DietType=="herbivore")
+                {
+                    herbivore++;
+                }
+                Console.WriteLine("Carnivores: " + carnivore);
+                Console.WriteLine("Herbivores: " + herbivore);
+            }
+        }
+          static void Heaviest(IEnumerable<Dinosaurid> dinosaurs)
+        {
+            Console.WriteLine("Jurrassic Park's three Heaviest dinosaurs");
+            Console.WriteLine("--------------------");
+            var heaviest=dinosaurs.OrderByDescending(x=>x.Weight).Take(3);
+            foreach(var dinosaur in heaviest)
+            {
+            Console.WriteLine($"Name: {dinosaur.Name},Weight: {dinosaur.Weight}");
             }
         }
         static void RemoveDinosaur()
@@ -45,15 +77,23 @@ namespace jurassic_park
             Console.WriteLine("What dinosaur would you like to remove?");
             var searchTerm=Console.ReadLine();
             var results = Dinosaurs
-            .Where(dinosaur=>
+            .FirstOrDefault(dinosaur=>
             dinosaur.Name.ToLower()
-            .Contains(searchTerm.ToLower()));
-            Dinosaurs.remove(results);
+            ==searchTerm.ToLower());
+            Dinosaurs.Remove(results);
+            Console.WriteLine("Dinosaur Removed");
         }
 
         static void TransferDinosaur()
         {
-            Console.WriteLine("Transfering");
+            Console.WriteLine("What dinosaur would you like to transfer?");
+            var result=Console.ReadLine();
+            Console.WriteLine("What pen would you like to transfer the dinosaur to?");
+            var location = Console.ReadLine();
+
+            var transfer = Dinosaurs.FirstOrDefault(dinosaur =>dinosaur.Name.ToLower() == result.ToLower());
+            transfer.EnclosureNumber=location;
+            Console.WriteLine("dinosaur transferred.");
         }
 
         static void UnknownCommand()
@@ -73,7 +113,7 @@ namespace jurassic_park
             while(input !="quit")
             {
                 Console.WriteLine("what would you like to do?");
-                Console.WriteLine("Avaialble commands are add,view, remove, transfer, and quit");
+                Console.WriteLine("Available commands are add,view, remove, transfer, diet, heaviest, and quit");
                 input=Console.ReadLine().ToLower();
                 if (input=="add")
                 {
@@ -90,6 +130,14 @@ namespace jurassic_park
                 else if(input=="transfer")
                 {
                     TransferDinosaur();
+                }
+                else if(input=="diet")
+                {
+                    DietSummary(Dinosaurs);
+                }
+                 else if(input=="heaviest")
+                {
+                    Heaviest(Dinosaurs);
                 }
                 else if(input=="quit")
                 {
