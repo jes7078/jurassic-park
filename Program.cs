@@ -8,7 +8,7 @@ namespace jurassic_park
     {
         // static List<Dinosaurid> Dinosaurs = new List<Dinosaurid>();
 
-        static JurassicContext Db = new DatabaseContext();
+        static JurassicContext Db = new JurassicContext();
         static void AddDinosaur()
         {
             Console.WriteLine("What Dinosaur would you like to add?");
@@ -43,7 +43,7 @@ namespace jurassic_park
             
             foreach (var dinosaur in date)
             {
-                Console.WriteLine($"Id: {Id}, Name: {dinosaur.Name}, Diet: {dinosaur.DietType}, Weight: {dinosaur.Weight}, Enclosure: {dinosaur.EnclosureNumber}, Date Acquired: {dinosaur.DateAcquired}");
+                Console.WriteLine($"Id: {dinosaur.Id}, Name: {dinosaur.Name}, Diet: {dinosaur.DietType}, Weight: {dinosaur.Weight}, Enclosure: {dinosaur.EnclosureNumber}, Date Acquired: {dinosaur.DateAcquired}");
             }
         }
         static void DietSummary(IEnumerable<Dinosaurid> dinosaurs)
@@ -76,6 +76,15 @@ namespace jurassic_park
             Console.WriteLine($"Name: {dinosaur.Name},Weight: {dinosaur.Weight}");
             }
         }
+
+        static void NeedsASheep(IEnumerable<Dinosaurid> dinosaurs)
+        {
+            var lightest=dinosaurs.Where(n=>n.DietType=="carnivore").OrderBy(x=>x.Weight).Take(1);
+            foreach(var dinosaur in lightest)
+            {
+            Console.WriteLine($"Name: {dinosaur.Name},Weight:{dinosaur.Weight} needs a sheep.");
+            }
+        }
         static void RemoveDinosaur()
         {
             Console.WriteLine("What dinosaur would you like to remove?");
@@ -89,6 +98,25 @@ namespace jurassic_park
             Db.SaveChanges();
         }
 
+        static void Hatch(IEnumerable<Dinosaurid> dinosaurs)
+        {
+            string[] names = {"Amy", "Brian", "Charlie", "Diane"};
+            var random = new Random((int)DateTime.Now.Ticks);
+            var nameRandomValue=random.Next(0,4);
+            var weightRandomValue=random.Next(1,101);
+            var dietRandomValue=random.Next(0,2);
+            string weight = weightRandomValue.ToString();
+            string[] diet = {"carnivore", "herbivore"};
+             var dinosaur = new Dinosaurid();
+            dinosaur.Name=names[nameRandomValue];
+            dinosaur.DietType=diet[dietRandomValue];
+            dinosaur.Weight=weight;
+            dinosaur.DateAcquired=DateTime.Now;
+            Db.Dinosaurids.Add(dinosaur);
+            Db.SaveChanges();
+
+        }
+
         static void TransferDinosaur()
         {
             Console.WriteLine("What dinosaur would you like to transfer?");
@@ -100,6 +128,17 @@ namespace jurassic_park
             transfer.EnclosureNumber=location;
             Console.WriteLine("dinosaur transferred.");
             Db.SaveChanges();
+        }
+
+        static void Release()
+        {
+            Console.WriteLine("What dinosaur would you like to release?");
+            var result=Console.ReadLine();
+            var releasing = Db.Dinosaurids.FirstOrDefault(dinosaur=>dinosaur.Name.ToLower() == result.ToLower());
+            releasing.EnclosureNumber=null;
+            Console.WriteLine("dinosaur released, run fast!!!");
+            Db.SaveChanges();
+
         }
 
         static void UnknownCommand()
@@ -119,7 +158,7 @@ namespace jurassic_park
             while(input !="quit")
             {
                 Console.WriteLine("what would you like to do?");
-                Console.WriteLine("Available commands are add,view, remove, transfer, diet, heaviest, and quit");
+                Console.WriteLine("Available commands are add,view, remove, transfer, diet, heaviest, hatch, release, needs a sheep, and quit");
                 input=Console.ReadLine().ToLower();
                 if (input=="add")
                 {
@@ -145,9 +184,21 @@ namespace jurassic_park
                 {
                     Heaviest(Db.Dinosaurids);
                 }
+                else if(input=="needs a sheep")
+                {
+                    NeedsASheep(Db.Dinosaurids);
+                }
+                else if(input=="hatch")
+                {
+                    Hatch(Db.Dinosaurids);
+                }
                 else if(input=="quit")
                 {
                     QuitProgramMessage();
+                }
+                else if(input=="release")
+                {
+                    Release();
                 }
                 else
                 { 
