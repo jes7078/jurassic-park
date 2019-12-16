@@ -6,7 +6,9 @@ namespace jurassic_park
 {
     class Program
     {
-        static List<Dinosaurid> Dinosaurs = new List<Dinosaurid>();
+        // static List<Dinosaurid> Dinosaurs = new List<Dinosaurid>();
+
+        static JurassicContext Db = new DatabaseContext();
         static void AddDinosaur()
         {
             Console.WriteLine("What Dinosaur would you like to add?");
@@ -23,12 +25,14 @@ namespace jurassic_park
             dinosaur.Weight=dinosaurWeight;
             dinosaur.EnclosureNumber=enclosureNumber;
             dinosaur.DateAcquired=DateTime.Now;
-            Dinosaurs.Add(dinosaur);
+            // Dinosaurs.Add(dinosaur);
+            Db.Dinosaurids.Add(dinosaur);
+            Db.SaveChanges();
         }
 
         static void ViewDinosaur()
         {
-            DisplayListofDinosaurids(Dinosaurs);
+            DisplayListofDinosaurids(Db.Dinosaurids);
         }
 
         static void DisplayListofDinosaurids(IEnumerable<Dinosaurid> dinosaurs)
@@ -39,7 +43,7 @@ namespace jurassic_park
             
             foreach (var dinosaur in date)
             {
-                Console.WriteLine($"Name: {dinosaur.Name}, Diet: {dinosaur.DietType}, Weight: {dinosaur.Weight}, Enclosure: {dinosaur.EnclosureNumber}, Date Acquired: {dinosaur.DateAcquired}");
+                Console.WriteLine($"Id: {Id}, Name: {dinosaur.Name}, Diet: {dinosaur.DietType}, Weight: {dinosaur.Weight}, Enclosure: {dinosaur.EnclosureNumber}, Date Acquired: {dinosaur.DateAcquired}");
             }
         }
         static void DietSummary(IEnumerable<Dinosaurid> dinosaurs)
@@ -76,12 +80,13 @@ namespace jurassic_park
         {
             Console.WriteLine("What dinosaur would you like to remove?");
             var searchTerm=Console.ReadLine();
-            var results = Dinosaurs
+            var results = Db.Dinosaurids
             .FirstOrDefault(dinosaur=>
             dinosaur.Name.ToLower()
             ==searchTerm.ToLower());
-            Dinosaurs.Remove(results);
+            Db.Dinosaurids.Remove(results);
             Console.WriteLine("Dinosaur Removed");
+            Db.SaveChanges();
         }
 
         static void TransferDinosaur()
@@ -91,9 +96,10 @@ namespace jurassic_park
             Console.WriteLine("What pen would you like to transfer the dinosaur to?");
             var location = Console.ReadLine();
 
-            var transfer = Dinosaurs.FirstOrDefault(dinosaur =>dinosaur.Name.ToLower() == result.ToLower());
+            var transfer = Db.Dinosaurids.FirstOrDefault(dinosaur =>dinosaur.Name.ToLower() == result.ToLower());
             transfer.EnclosureNumber=location;
             Console.WriteLine("dinosaur transferred.");
+            Db.SaveChanges();
         }
 
         static void UnknownCommand()
@@ -133,11 +139,11 @@ namespace jurassic_park
                 }
                 else if(input=="diet")
                 {
-                    DietSummary(Dinosaurs);
+                    DietSummary(Db.Dinosaurids);
                 }
                  else if(input=="heaviest")
                 {
-                    Heaviest(Dinosaurs);
+                    Heaviest(Db.Dinosaurids);
                 }
                 else if(input=="quit")
                 {
